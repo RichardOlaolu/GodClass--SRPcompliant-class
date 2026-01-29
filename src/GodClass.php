@@ -1,8 +1,7 @@
 <?php
 namespace Richardolaolu\GodClass;
 
-use PDO;
-use Exception;
+
 
 /*
  * GodClass
@@ -18,11 +17,11 @@ use Exception;
  */
 class GodClass
 {
-    private $dbHost = 'localhost';
-    private $dbUser = 'root';
-    private $dbPass = '';
-    private $dbName = 'my_app';
-    private $pdo;
+    public $dbHost = 'localhost';
+    public $dbUser = 'root';
+    public $dbPass = '';
+    public $dbName = 'my_app';
+    public $pdo;
 
     public function __construct()
     {
@@ -32,78 +31,17 @@ class GodClass
 
     // --- Database Responsibilities ---
 
-    private function connectDB()
-    {
-        try {
-            $dsn = "mysql:host={$this->dbHost};dbname={$this->dbName};charset=utf8mb4";
-            $this->pdo = new PDO($dsn, $this->dbUser, $this->dbPass);
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->log("Database connected successfully.");
-        } catch (Exception $e) {
-            $this->log("DB Connection failed: " . $e->getMessage(), 'ERROR');
-            // Responsibility 7: HTML Rendering (Error page)
-            $this->renderErrorPage("Critical Database Error");
-            exit;
-        }
-    }
 
-    public function query($sql, $params = [])
-    {
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+
+
 
     // --- User Authentication Responsibilities ---
 
-    public function login($username, $password)
-    {
-        // Responsibility 6: Validation
-        if (!$this->validateString($username) || !$this->validateString($password)) {
-            return false;
-        }
 
-        $user = $this->query("SELECT * FROM users WHERE username = ?", [$username]);
 
-        if ($user && password_verify($password, $user[0]['password'])) {
-            $_SESSION['user_id'] = $user[0]['id'];
-            $this->log("User $username logged in.");
-            // Responsibility 3: Email (Login notification)
-            $this->sendEmail($user[0]['email'], "Login Alert", "You just logged in.");
-            return true;
-        }
-
-        $this->log("Failed login attempt for $username", 'WARNING');
-        return false;
-    }
-
-    public function registerUser($username, $password, $email)
-    {
-        if (!$this->validateEmail($email)) {
-            $this->renderErrorPage("Invalid Email");
-            return;
-        }
-
-        $hash = password_hash($password, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-        $this->query($sql, [$username, $email, $hash]);
-
-        $this->sendEmail($email, "Welcome", "Thanks for registering!");
-        $this->renderSuccessPage("Registration successful!");
-    }
 
     // --- Email Responsibilities ---
 
-    public function sendEmail($to, $subject, $body)
-    {
-        // Hardcoded mail logic (often would be a separate service)
-        $headers = "From: system@example.com";
-        if (mail($to, $subject, $body, $headers)) {
-            $this->log("Email sent to $to");
-        } else {
-            $this->log("Failed to send email to $to", 'ERROR');
-        }
-    }
 
     // --- Logging Responsibilities ---
 
