@@ -1,0 +1,16 @@
+{
+    "name": "richardolaolu/godclass",
+    "description": "Godclass php assingment",
+    "autoload": {
+        "psr-4": {
+            "Richardolaolu\\Godclass\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "RichardOlaolu",
+            "email": "oladipupoayomikun24@gmail.com"
+        }
+    ],
+    "require": {}
+}
